@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% block title %}Create Account — Listify{% endblock %}
+
+{% block extra_css %}
+.auth-wrap {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--gold-cream);
+}
+
+.auth-left {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 4rem;
+    background: linear-gradient(160deg, #8b1050 0%, var(--fuchsia) 100%);
+    position: relative; overflow: hidden;
+}
+.auth-left::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 70% 30%, rgba(201,168,76,0.2) 0%, transparent 60%);
+}
+.auth-left-inner { position: relative; z-index: 1; }
+.auth-logo { font-family: var(--font-display); font-size: 2.5rem; font-weight: 700; color: white; margin-bottom: 2rem; letter-spacing: -1px; }
+.auth-logo span { color: var(--gold-light); }
+.auth-tagline { font-size: 1.6rem; font-weight: 300; color: rgba(255,255,255,0.9); line-height: 1.4; margin-bottom: 1rem; font-family: var(--font-display); }
+.auth-desc { font-size: 0.9rem; color: rgba(255,255,255,0.65); line-height: 1.7; max-width: 320px; }
+.auth-orb { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.06); }
+.auth-orb-1 { width: 300px; height: 300px; bottom: -80px; left: -60px; }
+.auth-orb-2 { width: 140px; height: 140px; top: 10%; left: 60%; }
+
+.auth-right {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 3rem 2rem;
+    background: white; overflow-y: auto;
+}
+.auth-card { width: 100%; max-width: 420px; }
+.auth-head { margin-bottom: 2rem; }
+.auth-head h1 { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.35rem; }
+.auth-head p { color: var(--gray-500); font-size: 0.9rem; }
+
+.auth-form { display: flex; flex-direction: column; gap: 1rem; }
+
+.auth-btn {
+    width: 100%; padding: 0.85rem;
+    font-size: 1rem; font-weight: 600;
+    background: var(--fuchsia); color: white; border: none;
+    border-radius: var(--radius-sm); cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 2px 10px rgba(192,37,107,0.3);
+    margin-top: 0.25rem;
+}
+.auth-btn:hover { background: var(--fuchsia-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(192,37,107,0.4); }
+
+.auth-switch { text-align: center; font-size: 0.875rem; color: var(--gray-500); margin-top: 1rem; }
+.auth-switch a { color: var(--fuchsia); font-weight: 600; text-decoration: none; }
+.auth-switch a:hover { text-decoration: underline; }
+
+.input-wrap { position: relative; }
+.input-wrap .form-input { padding-right: 2.5rem; }
+.input-toggle { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--gray-400); font-size: 1rem; padding: 0; transition: color var(--transition); }
+.input-toggle:hover { color: var(--fuchsia); }
+
+.pw-strength { margin-top: 0.4rem; }
+.pw-strength-bar { height: 4px; border-radius: 2px; background: var(--gray-100); overflow: hidden; margin-bottom: 0.25rem; }
+.pw-strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s ease, background 0.3s ease; width: 0; }
+.pw-strength-text { font-size: 0.75rem; color: var(--gray-500); }
+
+.username-hint { font-size: 0.78rem; color: var(--gray-400); margin-top: 0.25rem; }
+
+@media (max-width: 700px) {
+    .auth-wrap { grid-template-columns: 1fr; }
+    .auth-left { display: none; }
+}
+{% endblock %}
+
+{% block body %}
+<div class="auth-wrap">
+    <div class="auth-left">
+        <div class="auth-orb auth-orb-1"></div>
+        <div class="auth-orb auth-orb-2"></div>
+        <div class="auth-left-inner">
+            <div class="auth-logo">List<span>ify</span></div>
+            <div class="auth-tagline">Start organising<br>beautifully.</div>
+            <p class="auth-desc">Join thousands of people who use Listify to keep their ideas, tasks, and notes in perfect order.</p>
+        </div>
+    </div>
+
+    <div class="auth-right">
+        <div class="auth-card">
+            <div class="auth-head">
+                <h1>Create account</h1>
+                <p>Fill in the details below to get started.</p>
+            </div>
+
+            <form class="auth-form" id="signupForm" method="POST" action="{% url 'signup' %}" novalidate>
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <input class="form-input" type="text" id="username" name="username"
+                           placeholder="e.g. john_doe" maxlength="20"
+                           autocomplete="username" required value="{{ form.username.value|default:'' }}">
+                    <span class="username-hint">3–20 chars · letters, numbers, underscores only</span>
+                    <span class="form-error" id="usernameErr"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input class="form-input" type="email" id="email" name="email"
+                           placeholder="you@example.com" autocomplete="email"
+                           required value="{{ form.email.value|default:'' }}">
+                    <span class="form-error" id="emailErr"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password1">Password</label>
+                    <div class="input-wrap">
+                        <input class="form-input" type="password" id="password1" name="password1"
+                               placeholder="Min. 8 characters" autocomplete="new-password" required>
+                        <button type="button" class="input-toggle" onclick="togglePw('password1', this)">👁</button>
+                    </div>
+                    <div class="pw-strength">
+                        <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwFill"></div></div>
+                        <span class="pw-strength-text" id="pwStrengthText"></span>
+                    </div>
+                    <span class="form-error" id="password1Err"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password2">Confirm Password</label>
+                    <div class="input-wrap">
+                        <input class="form-input" type="password" id="password2" name="password2"
+                               placeholder="Re-enter your password" autocomplete="new-password" required>
+                        <button type="button" class="input-toggle" onclick="togglePw('password2', this)">👁</button>
+                    </div>
+                    <span class="form-error" id="password2Err"></span>
+                </div>
+
+                <button type="submit" class="auth-btn">Create Account</button>
+            </form>
+
+            <p class="auth-switch">
+                Already have an account? <a href="{% url 'login' %}">Log in</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+function showToast(msg, type='error', dur=4000) {
+    const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+    const wrap = document.getElementById('toastWrap');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${msg}</span>`;
+    wrap.appendChild(t);
+    setTimeout(() => { t.classList.add('toast-out'); setTimeout(() => t.remove(), 300); }, dur);
+}
+
+function togglePw(id, btn) {
+    const el = document.getElementById(id);
+    const show = el.type === 'password';
+    el.type = show ? 'text' : 'password';
+    btn.textContent = show ? '🙈' : '👁';
+}
+
+const USERNAME_RE = /^[a-zA-Z0-9_]+$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateUsername(val) {
+    if (!val) return 'Username is required.';
+    if (val.length < 3) return 'At least 3 characters required.';
+    if (val.length > 20) return 'Maximum 20 characters allowed.';
+    if (!USERNAME_RE.test(val)) return 'Only letters, numbers, and underscores (_) are allowed.';
+    return '';
+}
+function validateEmail(val) {
+    if (!val) return 'Email is required.';
+    if (!EMAIL_RE.test(val)) return 'Enter a valid email address.';
+    return '';
+}
+function validatePassword(val) {
+    if (!val) return 'Password is required.';
+    if (val.length < 8) return 'Password must be at least 8 characters.';
+    return '';
+}
+function validateConfirm(val, pw) {
+    if (!val) return 'Please confirm your password.';
+    if (val !== pw) return 'Passwords do not match.';
+    return '';
+}
+
+function setError(inputId, errId, msg) {
+    const inp = document.getElementById(inputId);
+    const err = document.getElementById(errId);
+    if (msg) {
+        inp.classList.add('error'); err.textContent = msg; err.classList.add('visible');
+    } else {
+        inp.classList.remove('error'); err.textContent = ''; err.classList.remove('visible');
+    }
+    return !msg;
+}
+
+// Password strength
+document.getElementById('password1').addEventListener('input', function() {
+    const v = this.value;
+    let score = 0;
+    if (v.length >= 8) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    const fill = document.getElementById('pwFill');
+    const txt  = document.getElementById('pwStrengthText');
+    const cols = ['', '#e53e3e', '#ed8936', '#38a169', '#276749'];
+    const labs = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+    fill.style.width = `${score * 25}%`;
+    fill.style.background = cols[score] || '#e53e3e';
+    txt.textContent = v ? labs[score] || 'Weak' : '';
+    setError('password1', 'password1Err', validatePassword(v));
+});
+
+// Live validation
+document.getElementById('username').addEventListener('input', function() { setError('username','usernameErr', validateUsername(this.value.trim())); });
+document.getElementById('email').addEventListener('blur', function() { setError('email','emailErr', validateEmail(this.value.trim())); });
+document.getElementById('password2').addEventListener('input', function() { setError('password2','password2Err', validateConfirm(this.value, document.getElementById('password1').value)); });
+
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+    const u = document.getElementById('username').value.trim();
+    const em = document.getElementById('email').value.trim();
+    const p1 = document.getElementById('password1').value;
+    const p2 = document.getElementById('password2').value;
+    let ok = true;
+    ok = setError('username','usernameErr', validateUsername(u)) && ok;
+    ok = setError('email','emailErr', validateEmail(em)) && ok;
+    ok = setError('password1','password1Err', validatePassword(p1)) && ok;
+    ok = setError('password2','password2Err', validateConfirm(p2, p1)) && ok;
+    if (!ok) e.preventDefault();
+});
+
+{% if messages %}{% for message in messages %}
+document.addEventListener('DOMContentLoaded', () => showToast("{{ message }}", "{{ message.tags|default:'error' }}"));
+{% endfor %}{% endif %}
+</script>
+{% endblock %}

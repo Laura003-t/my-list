@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block title %}Profile — Listify{% endblock %}
+
+{% block extra_css %}
+.profile-wrap {
+    max-width: 720px; margin: 0 auto;
+}
+
+.profile-hero {
+    background: linear-gradient(135deg, var(--fuchsia) 0%, #8b1050 100%);
+    border-radius: var(--radius-lg);
+    padding: 3rem 2.5rem 2rem;
+    position: relative; overflow: hidden; margin-bottom: 1.5rem;
+}
+.profile-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 85% 50%, rgba(201,168,76,0.2) 0%, transparent 50%);
+}
+.profile-hero-inner {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; gap: 2rem;
+}
+.profile-avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%; border: 3px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 2.5rem;
+    font-weight: 700; color: white; flex-shrink: 0;
+    backdrop-filter: blur(8px);
+}
+.profile-hero-name { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: white; margin-bottom: 0.2rem; }
+.profile-hero-sub { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+.profile-hero-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px; padding: 0.25rem 0.75rem;
+    font-size: 0.78rem; font-weight: 600; color: rgba(255,255,255,0.9);
+    margin-top: 0.6rem; backdrop-filter: blur(4px);
+}
+
+.profile-card {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid rgba(0,0,0,0.05);
+    overflow: hidden; margin-bottom: 1.25rem;
+}
+.profile-card-head {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.profile-card-title { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+
+.profile-field {
+    display: flex; align-items: center;
+    padding: 1rem 1.5rem; border-bottom: 1px solid var(--gray-100);
+}
+.profile-field:last-child { border-bottom: none; }
+.profile-field-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; margin-right: 1rem; }
+.profile-field-icon.fuchsia { background: var(--fuchsia-pale); }
+.profile-field-icon.gold    { background: var(--gold-pale); }
+.profile-field-icon.gray    { background: var(--gray-100); }
+.profile-field-label { font-size: 0.75rem; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+.profile-field-value { font-size: 0.95rem; color: var(--gray-900); font-weight: 500; }
+
+.stat-mini-grid { display: grid; grid-template-columns: repeat(3,1fr); }
+.stat-mini {
+    text-align: center; padding: 1.25rem 1rem;
+    border-right: 1px solid var(--gray-100);
+}
+.stat-mini:last-child { border-right: none; }
+.stat-mini-val { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--fuchsia); }
+.stat-mini-lbl { font-size: 0.78rem; color: var(--gray-500); margin-top: 0.2rem; }
+
+.readonly-note {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: var(--gold-pale); border: 1px solid rgba(201,168,76,0.25);
+    border-radius: var(--radius-sm); padding: 0.75rem 1rem;
+    font-size: 0.82rem; color: #7a5a00; margin-bottom: 1.25rem;
+}
+
+@media (max-width: 600px) {
+    .profile-hero-inner { flex-direction: column; text-align: center; gap: 1rem; }
+    .profile-hero { padding: 2rem 1.5rem; }
+    .profile-hero-name { font-size: 1.5rem; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page profile-wrap">
+    <div class="breadcrumb">
+        <a href="{% url 'home' %}">Home</a>
+        <span class="breadcrumb-sep">/</span>
+        <span>Profile</span>
+    </div>
+
+    <!-- Hero -->
+    <div class="profile-hero">
+        <div class="profile-hero-inner">
+            <div class="profile-avatar">{{ user.username|first|upper }}</div>
+            <div>
+                <div class="profile-hero-name">{{ user.username }}</div>
+                <div class="profile-hero-sub">{{ user.email }}</div>
+                <div class="profile-hero-badge">✨ Member since {{ user.created_at|date:"F Y" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Readonly note -->
+    <div class="readonly-note">
+        ℹ️ Profile details are for viewing only. Contact support if you need to update your information.
+    </div>
+
+    <!-- Stats -->
+    <div class="profile-card">
+        <div class="profile-card-head">
+            <div class="profile-card-title">Your Activity</div>
+        </div>
+        <div class="stat-mini-grid">
+            <div class="stat-mini">
+                <div class="stat-mini-val">{{ folder_count }}</div>
+                <div class="stat-mini-lbl">Folders</div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-val">{{ list_count }}</div>
+                <div class="stat-mini-lbl">Lists</div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-val">{{ item_count }}</div>
+                <div class="stat-mini-lbl">Items</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details -->
+    <div class="profile-card">
+        <div class="profile-card-head">
+            <div class="profile-card-title">Account Details</div>
+            <span class="badge badge-gray">Read-only</span>
+        </div>
+
+        <div class="profile-field">
+            <div class="profile-field-icon fuchsia">👤</div>
+            <div>
+                <div class="profile-field-label">User ID</div>
+                <div class="profile-field-value" style="font-family:monospace;letter-spacing:0.04em;">{{ user.userid }}</div>
+            </div>
+        </div>
+        <div class="profile-field">
+            <div class="profile-field-icon fuchsia">🏷</div>
+            <div>
+                <div class="profile-field-label">Username</div>
+                <div class="profile-field-value">{{ user.username }}</div>
+            </div>
+        </div>
+        <div class="profile-field">
+            <div class="profile-field-icon gold">📧</div>
+            <div>
+                <div class="profile-field-label">Email Address</div>
+                <div class="profile-field-value">{{ user.email }}</div>
+            </div>
+        </div>
+        <div class="profile-field">
+            <div class="profile-field-icon gray">🗓</div>
+            <div>
+                <div class="profile-field-label">Member Since</div>
+                <div class="profile-field-value">{{ user.created_at|date:"F j, Y" }}</div>
+            </div>
+        </div>
+        <div class="profile-field">
+            <div class="profile-field-icon gray">🔄</div>
+            <div>
+                <div class="profile-field-label">Last Updated</div>
+                <div class="profile-field-value">{{ user.updated_on|date:"F j, Y" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danger zone -->
+    <div class="profile-card">
+        <div class="profile-card-head">
+            <div class="profile-card-title">Session</div>
+        </div>
+        <div style="padding:1.25rem 1.5rem; display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <div style="font-weight:600; color:var(--gray-900); font-size:0.9rem;">Log out of your account</div>
+                <div style="font-size:0.8rem; color:var(--gray-500); margin-top:0.15rem;">You'll be redirected to the login page.</div>
+            </div>
+            <button class="btn btn-danger btn-sm" id="logoutBtn">Log Out</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Listify{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --fuchsia:       #c0256b;
+            --fuchsia-light: #e8528a;
+            --fuchsia-pale:  #fce8f1;
+            --fuchsia-soft:  #f7d0e3;
+            --gold:          #c9a84c;
+            --gold-light:    #e8c96a;
+            --gold-cream:    #fdf6e3;
+            --gold-pale:     #faf0d0;
+            --gray-900:      #1c1c1e;
+            --gray-700:      #3a3a3c;
+            --gray-500:      #6c6c70;
+            --gray-300:      #c7c7cc;
+            --gray-100:      #f2f2f7;
+            --gray-50:       #fafafa;
+            --white:         #ffffff;
+            --shadow-sm:     0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md:     0 4px 12px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.07);
+            --shadow-lg:     0 10px 30px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08);
+            --radius:        12px;
+            --radius-sm:     8px;
+            --radius-lg:     20px;
+            --font-display:  'Playfair Display', Georgia, serif;
+            --font-body:     'DM Sans', system-ui, sans-serif;
+            --transition:    0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--gray-50);
+            color: var(--gray-900);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ── NAV ── */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(192,37,107,0.12);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+        .nav-brand {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--fuchsia);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        .nav-brand span { color: var(--gold); }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .nav-link {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            transition: background var(--transition), color var(--transition);
+        }
+        .nav-link:hover, .nav-link.active {
+            background: var(--fuchsia-pale);
+            color: var(--fuchsia);
+        }
+        .nav-link.active {
+            font-weight: 600;
+        }
+        .nav-avatar {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--fuchsia), var(--gold));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.8rem; color: white;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition), box-shadow var(--transition);
+            text-decoration: none;
+        }
+        .nav-avatar:hover { transform: scale(1.08); box-shadow: var(--shadow-md); }
+
+        /* ── PAGE WRAPPER ── */
+        .page { max-width: 1120px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .page-wide { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+            font-family: var(--font-body); font-weight: 500; font-size: 0.9rem;
+            padding: 0.6rem 1.4rem; border-radius: var(--radius-sm);
+            border: none; cursor: pointer; transition: all var(--transition);
+            text-decoration: none; white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--fuchsia); color: white;
+            box-shadow: 0 2px 8px rgba(192,37,107,0.28);
+        }
+        .btn-primary:hover {
+            background: var(--fuchsia-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(192,37,107,0.38);
+        }
+        .btn-gold {
+            background: var(--gold); color: white;
+            box-shadow: 0 2px 8px rgba(201,168,76,0.28);
+        }
+        .btn-gold:hover {
+            background: var(--gold-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(201,168,76,0.38);
+        }
+        .btn-outline {
+            background: transparent; color: var(--fuchsia);
+            border: 1.5px solid var(--fuchsia);
+        }
+        .btn-outline:hover { background: var(--fuchsia-pale); }
+        .btn-ghost {
+            background: transparent; color: var(--gray-500);
+            border: 1.5px solid var(--gray-300);
+        }
+        .btn-ghost:hover { background: var(--gray-100); color: var(--gray-700); }
+        .btn-danger { background: #e53e3e; color: white; }
+        .btn-danger:hover { background: #c53030; }
+        .btn-sm { font-size: 0.8rem; padding: 0.4rem 0.9rem; }
+        .btn-lg { font-size: 1rem; padding: 0.8rem 2rem; }
+        .btn-icon {
+            width: 36px; height: 36px; padding: 0; border-radius: var(--radius-sm);
+            background: var(--gray-100); color: var(--gray-500); border: none;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+            transition: all var(--transition);
+        }
+        .btn-icon:hover { background: var(--fuchsia-pale); color: var(--fuchsia); }
+        .btn-icon.danger:hover { background: #fee; color: #e53e3e; }
+
+        /* ── FORMS ── */
+        .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+        .form-label { font-size: 0.82rem; font-weight: 600; color: var(--gray-700); letter-spacing: 0.02em; text-transform: uppercase; }
+        .form-input {
+            font-family: var(--font-body); font-size: 0.95rem;
+            padding: 0.7rem 1rem; border-radius: var(--radius-sm);
+            border: 1.5px solid var(--gray-300); background: white; color: var(--gray-900);
+            outline: none; transition: border var(--transition), box-shadow var(--transition);
+            width: 100%;
+        }
+        .form-input:focus { border-color: var(--fuchsia); box-shadow: 0 0 0 3px rgba(192,37,107,0.12); }
+        .form-input.error { border-color: #e53e3e; box-shadow: 0 0 0 3px rgba(229,62,62,0.12); }
+        .form-error { font-size: 0.8rem; color: #e53e3e; display: none; }
+        .form-error.visible { display: block; }
+        select.form-input { cursor: pointer; }
+        textarea.form-input { resize: vertical; min-height: 80px; }
+
+        /* ── CARDS ── */
+        .card {
+            background: white; border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: box-shadow var(--transition), transform var(--transition);
+        }
+        .card:hover { box-shadow: var(--shadow-md); }
+        .card-clickable { cursor: pointer; }
+        .card-clickable:hover { transform: translateY(-2px); }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(28,28,30,0.45); backdrop-filter: blur(4px);
+            z-index: 200; align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: white; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg); padding: 2rem;
+            width: min(480px, 92vw); position: relative;
+            animation: modalIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(16px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-close {
+            position: absolute; top: 1rem; right: 1rem;
+            background: var(--gray-100); border: none; width: 30px; height: 30px;
+            border-radius: 50%; cursor: pointer; font-size: 1rem; color: var(--gray-500);
+            display: flex; align-items: center; justify-content: center;
+            transition: background var(--transition), color var(--transition);
+        }
+        .modal-close:hover { background: var(--fuchsia-pale); color: var(--fuchsia); }
+        .modal-title {
+            font-family: var(--font-display); font-size: 1.3rem; font-weight: 700;
+            color: var(--gray-900); margin-bottom: 1.25rem;
+        }
+        .modal-footer { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+        /* ── TOAST ── */
+        .toast-wrap {
+            position: fixed; top: 1.25rem; right: 1.25rem; z-index: 999;
+            display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
+        }
+        .toast {
+            background: white; border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg); padding: 0.85rem 1.2rem;
+            display: flex; align-items: center; gap: 0.65rem; font-size: 0.9rem;
+            border-left: 3px solid var(--fuchsia); max-width: 320px;
+            animation: toastIn 0.25s ease; pointer-events: all;
+        }
+        .toast.success { border-color: #38a169; }
+        .toast.error   { border-color: #e53e3e; }
+        .toast.warning { border-color: var(--gold); }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .toast-icon { font-size: 1rem; }
+        .toast-out { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastOut {
+            to { opacity: 0; transform: translateX(40px); }
+        }
+
+        /* ── SECTION HEADER ── */
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .section-title {
+            font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--gray-900);
+        }
+        .section-sub { font-size: 0.875rem; color: var(--gray-500); margin-top: 0.15rem; }
+
+        /* ── BREADCRUMB ── */
+        .breadcrumb { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--gray-500); margin-bottom: 1.25rem; }
+        .breadcrumb a { color: var(--fuchsia); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb-sep { color: var(--gray-300); }
+
+        /* ── BADGE ── */
+        .badge {
+            display: inline-flex; align-items: center; padding: 0.2rem 0.65rem;
+            border-radius: 20px; font-size: 0.73rem; font-weight: 600; letter-spacing: 0.02em;
+        }
+        .badge-fuchsia { background: var(--fuchsia-pale); color: var(--fuchsia); }
+        .badge-gold    { background: var(--gold-pale);    color: #7a5a00; }
+        .badge-gray    { background: var(--gray-100);     color: var(--gray-500); }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center; padding: 4rem 2rem;
+            color: var(--gray-500);
+        }
+        .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+        .empty-title { font-family: var(--font-display); font-size: 1.2rem; color: var(--gray-700); margin-bottom: 0.5rem; }
+        .empty-sub { font-size: 0.9rem; }
+
+        /* ── DIVIDER ── */
+        .divider { height: 1px; background: var(--gray-100); margin: 1rem 0; }
+
+        /* ── UTILS ── */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .w-full { width: 100%; }
+        .text-sm { font-size: 0.875rem; }
+        .text-muted { color: var(--gray-500); }
+        .text-fuchsia { color: var(--fuchsia); }
+        .text-gold { color: var(--gold); }
+        .font-display { font-family: var(--font-display); }
+        .fw-600 { font-weight: 600; }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--fuchsia-light); }
+
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+{% block body %}
+    {% if show_nav %}
+    <nav class="nav">
+        <a href="{% url 'home' %}" class="nav-brand">List<span>ify</span></a>
+        <div class="nav-links">
+            <a href="{% url 'home' %}" class="nav-link {% block nav_home %}{% endblock %}">Home</a>
+            <a href="{% url 'folders' %}" class="nav-link {% block nav_folders %}{% endblock %}">Folders</a>
+            <a href="{% url 'profile' %}" class="nav-avatar" title="Profile">{{ user.username|first|upper }}</a>
+            <button class="btn btn-ghost btn-sm" id="logoutBtn" style="margin-left:0.5rem;">Log out</button>
+        </div>
+    </nav>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <!-- Logout confirm modal -->
+    {% if show_nav %}
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal" style="max-width:380px; text-align:center;">
+            <div style="font-size:2.5rem; margin-bottom:0.75rem;">👋</div>
+            <div class="modal-title" style="text-align:center;">Leaving so soon?</div>
+            <p style="color:var(--gray-500); font-size:0.9rem; margin-bottom:1.5rem;">Are you sure you want to log out of your account?</p>
+            <div style="display:flex; gap:0.75rem; justify-content:center;">
+                <button class="btn btn-ghost" onclick="closeLogout()">Cancel</button>
+                <a href="{% url 'logout' %}" class="btn btn-danger">Yes, log out</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+    // Toast system
+    function showToast(msg, type='info', dur=3500) {
+        const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+        const wrap = document.getElementById('toastWrap');
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<span class="toast-icon">${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+        wrap.appendChild(t);
+        setTimeout(() => { t.classList.add('toast-out'); setTimeout(() => t.remove(), 300); }, dur);
+    }
+
+    // Logout modal
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutModal = document.getElementById('logoutModal');
+    if (logoutBtn) logoutBtn.onclick = () => logoutModal.classList.add('open');
+    function closeLogout() { logoutModal.classList.remove('open'); }
+    if (logoutModal) logoutModal.addEventListener('click', e => { if (e.target === logoutModal) closeLogout(); });
+
+    // Django messages as toasts
+    {% if messages %}
+    {% for message in messages %}
+    document.addEventListener('DOMContentLoaded', () => showToast("{{ message }}", "{{ message.tags }}"));
+    {% endfor %}
+    {% endif %}
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

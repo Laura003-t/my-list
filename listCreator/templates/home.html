@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% block title %}Home — Listify{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block extra_css %}
+.hero {
+    background: linear-gradient(135deg, var(--fuchsia) 0%, #8b1050 100%);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 3rem;
+    color: white; margin-bottom: 2rem;
+    position: relative; overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 90% 50%, rgba(201,168,76,0.2) 0%, transparent 60%),
+                      radial-gradient(circle at 10% 80%, rgba(255,255,255,0.07) 0%, transparent 50%);
+}
+.hero-inner { position: relative; z-index: 1; }
+.hero-greeting {
+    font-size: 0.85rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 0.4rem;
+}
+.hero-name {
+    font-family: var(--font-display); font-size: 2.2rem; font-weight: 700;
+    margin-bottom: 0.5rem; color: white;
+}
+.hero-name span { color: var(--gold-light); }
+.hero-sub { color: rgba(255,255,255,0.75); font-size: 0.95rem; }
+
+.stats-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1rem; margin-bottom: 2rem;
+}
+.stat-card {
+    background: white; border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-sm);
+    display: flex; align-items: center; gap: 1rem;
+}
+.stat-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; flex-shrink: 0;
+}
+.stat-icon.fuchsia { background: var(--fuchsia-pale); }
+.stat-icon.gold    { background: var(--gold-pale); }
+.stat-icon.gray    { background: var(--gray-100); }
+.stat-val { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: var(--gray-900); line-height: 1; }
+.stat-lbl { font-size: 0.8rem; color: var(--gray-500); margin-top: 0.2rem; }
+
+.home-grid {
+    display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;
+}
+
+.widget {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+.widget-head {
+    padding: 1.25rem 1.5rem 0;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.widget-title {
+    font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; color: var(--gray-900);
+}
+.widget-body { padding: 1rem 1.5rem 1.5rem; }
+
+.folder-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;
+}
+.folder-thumb {
+    border-radius: var(--radius-sm); padding: 1rem;
+    border: 1.5px solid var(--gray-100);
+    cursor: pointer; transition: all var(--transition);
+    text-decoration: none; display: block;
+}
+.folder-thumb:hover { border-color: var(--fuchsia); background: var(--fuchsia-pale); }
+.folder-thumb-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.folder-thumb-name { font-weight: 600; font-size: 0.9rem; color: var(--gray-900); }
+.folder-thumb-sub { font-size: 0.78rem; color: var(--gray-500); margin-top: 0.15rem; }
+.folder-see-all { font-size: 0.85rem; color: var(--fuchsia); text-decoration: none; font-weight: 500; }
+.folder-see-all:hover { text-decoration: underline; }
+
+.activity-list { display: flex; flex-direction: column; gap: 0; }
+.activity-item {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    padding: 0.85rem 0; border-bottom: 1px solid var(--gray-100);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--fuchsia); flex-shrink: 0; margin-top: 0.4rem;
+}
+.activity-dot.gold { background: var(--gold); }
+.activity-dot.gray { background: var(--gray-300); }
+.activity-text { font-size: 0.875rem; color: var(--gray-700); line-height: 1.4; }
+.activity-time { font-size: 0.75rem; color: var(--gray-400); margin-top: 0.15rem; }
+
+.quick-actions { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem; }
+.quick-btn {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.85rem 1rem; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-100); cursor: pointer;
+    background: white; text-decoration: none; font-family: var(--font-body);
+    transition: all var(--transition); font-size: 0.875rem; color: var(--gray-700); font-weight: 500;
+}
+.quick-btn:hover { border-color: var(--fuchsia); background: var(--fuchsia-pale); color: var(--fuchsia); }
+.quick-btn-icon { font-size: 1.2rem; }
+
+@media (max-width: 900px) {
+    .home-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .hero { padding: 2rem; }
+    .hero-name { font-size: 1.7rem; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-inner">
+            <div class="hero-greeting">Good {{ time_of_day }}</div>
+            <div class="hero-name">Hello, <span>{{ user.username }}</span> 👋</div>
+            <div class="hero-sub">Here's what's going on with your workspace today.</div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon fuchsia">📁</div>
+            <div>
+                <div class="stat-val">{{ folder_count }}</div>
+                <div class="stat-lbl">Total Folders</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon gold">📋</div>
+            <div>
+                <div class="stat-val">{{ list_count }}</div>
+                <div class="stat-lbl">Total Lists</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon gray">✅</div>
+            <div>
+                <div class="stat-val">{{ checked_count }}</div>
+                <div class="stat-lbl">Items Checked</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main grid -->
+    <div class="home-grid">
+        <!-- Folders preview -->
+        <div>
+            <div class="widget">
+                <div class="widget-head">
+                    <div class="widget-title">Your Folders</div>
+                    <a class="folder-see-all" href="{% url 'folders' %}">See all →</a>
+                </div>
+                <div class="widget-body">
+                    {% if recent_folders %}
+                    <div class="folder-grid">
+                        {% for folder in recent_folders %}
+                        <a class="folder-thumb" href="{% url 'lists' folder.folderid %}">
+                            <div class="folder-thumb-icon">📁</div>
+                            <div class="folder-thumb-name">{{ folder.folder_name }}</div>
+                            <div class="folder-thumb-sub">{{ folder.list_set.count }} list{{ folder.list_set.count|pluralize }}</div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state" style="padding:2rem;">
+                        <div class="empty-icon">📂</div>
+                        <div class="empty-title">No folders yet</div>
+                        <div class="empty-sub">Head to Folders to create your first one.</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent activity -->
+            <div class="widget" style="margin-top:1.25rem;">
+                <div class="widget-head">
+                    <div class="widget-title">Recent Activity</div>
+                </div>
+                <div class="widget-body">
+                    {% if recent_activity %}
+                    <div class="activity-list">
+                        {% for act in recent_activity %}
+                        <div class="activity-item">
+                            <div class="activity-dot {{ act.color }}"></div>
+                            <div>
+                                <div class="activity-text">{{ act.description }}</div>
+                                <div class="activity-time">{{ act.time|timesince }} ago</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div style="text-align:center; padding:1.5rem; color:var(--gray-400); font-size:0.9rem;">
+                        No recent activity to show.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick actions + profile peek -->
+        <div>
+            <div class="widget">
+                <div class="widget-head">
+                    <div class="widget-title">Quick Actions</div>
+                </div>
+                <div class="widget-body">
+                    <div class="quick-actions">
+                        <a class="quick-btn" href="{% url 'folders' %}">
+                            <span class="quick-btn-icon">📁</span> View Folders
+                        </a>
+                        <a class="quick-btn" href="{% url 'folders' %}#new">
+                            <span class="quick-btn-icon">➕</span> New Folder
+                        </a>
+                        <a class="quick-btn" href="{% url 'profile' %}">
+                            <span class="quick-btn-icon">👤</span> My Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget" style="margin-top:1.25rem;">
+                <div class="widget-head">
+                    <div class="widget-title">Profile</div>
+                </div>
+                <div class="widget-body" style="text-align:center; padding-top:0.5rem;">
+                    <div style="width:64px;height:64px;background:linear-gradient(135deg,var(--fuchsia),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:700;color:white;margin:0 auto 0.75rem;">
+                        {{ user.username|first|upper }}
+                    </div>
+                    <div style="font-weight:600;font-size:0.95rem;color:var(--gray-900);">{{ user.username }}</div>
+                    <div style="font-size:0.8rem;color:var(--gray-500);margin-top:0.15rem;">{{ user.email }}</div>
+                    <a href="{% url 'profile' %}" class="btn btn-outline btn-sm" style="margin-top:1rem;">View Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

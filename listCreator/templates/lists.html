@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% block title %}{{ folder.folder_name }} — Listify{% endblock %}
+{% block nav_folders %}active{% endblock %}
+
+{% block extra_css %}
+.lists-layout { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; align-items: start; }
+
+/* Folder detail sidebar */
+.folder-sidebar {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid rgba(0,0,0,0.05);
+    overflow: hidden; position: sticky; top: 80px;
+}
+.folder-sidebar-banner {
+    height: 90px;
+    background: linear-gradient(135deg, var(--fuchsia), #8b1050);
+    display: flex; align-items: center; justify-content: center; font-size: 2.5rem;
+}
+.folder-sidebar-body { padding: 1.25rem; }
+.folder-sidebar-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.4rem; }
+.folder-sidebar-desc { font-size: 0.85rem; color: var(--gray-500); line-height: 1.5; margin-bottom: 1rem; }
+.folder-sidebar-meta { display: flex; flex-direction: column; gap: 0.4rem; }
+.folder-meta-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--gray-500); }
+.folder-meta-icon { width: 20px; text-align: center; }
+
+.folder-edit-form { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+/* Lists area */
+.lists-area {}
+.list-item {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1.5px solid rgba(0,0,0,0.05);
+    padding: 1.25rem 1.5rem;
+    display: flex; align-items: center; gap: 1.1rem;
+    cursor: pointer; text-decoration: none;
+    transition: all var(--transition); margin-bottom: 0.75rem;
+}
+.list-item:hover { transform: translateX(3px); box-shadow: var(--shadow-md); border-color: var(--fuchsia-soft); }
+.list-item-icon {
+    width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+}
+.list-icon-bullet  { background: var(--fuchsia-pale); }
+.list-icon-numbered { background: var(--gold-pale); }
+.list-icon-checkbox { background: #e8f5e9; }
+.list-item-body { flex: 1; min-width: 0; }
+.list-item-title { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list-item-desc { font-size: 0.82rem; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list-item-right { display: flex; align-items: center; gap: 0.75rem; }
+.list-item-count { font-size: 0.78rem; color: var(--gray-400); white-space: nowrap; }
+.list-arrow { color: var(--fuchsia); font-size: 1rem; transition: transform var(--transition); }
+.list-item:hover .list-arrow { transform: translateX(4px); }
+
+.new-list-card {
+    background: white; border-radius: var(--radius);
+    border: 2px dashed var(--gray-300);
+    padding: 1.25rem 1.5rem; cursor: pointer;
+    transition: all var(--transition);
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.5rem; color: var(--gray-400);
+    font-size: 0.9rem; font-weight: 600;
+}
+.new-list-card:hover { border-color: var(--fuchsia); color: var(--fuchsia); background: var(--fuchsia-pale); }
+
+/* type picker */
+.type-picker { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.6rem; margin-bottom: 0.5rem; }
+.type-option { display: none; }
+.type-label {
+    display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+    padding: 0.85rem 0.5rem; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-200); cursor: pointer;
+    font-size: 0.8rem; font-weight: 600; color: var(--gray-600);
+    text-align: center; transition: all var(--transition);
+}
+.type-label:hover { border-color: var(--fuchsia); color: var(--fuchsia); background: var(--fuchsia-pale); }
+.type-option:checked + .type-label { border-color: var(--fuchsia); background: var(--fuchsia-pale); color: var(--fuchsia); }
+.type-label-icon { font-size: 1.4rem; }
+
+@media (max-width: 800px) {
+    .lists-layout { grid-template-columns: 1fr; }
+    .folder-sidebar { position: static; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="breadcrumb">
+        <a href="{% url 'home' %}">Home</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="{% url 'folders' %}">Folders</a>
+        <span class="breadcrumb-sep">/</span>
+        <span>{{ folder.folder_name }}</span>
+    </div>
+
+    <div class="lists-layout">
+        <!-- Sidebar -->
+        <div class="folder-sidebar">
+            <div class="folder-sidebar-banner">📁</div>
+            <div class="folder-sidebar-body">
+                <div id="folderViewMode">
+                    <div class="folder-sidebar-name">{{ folder.folder_name }}</div>
+                    <div class="folder-sidebar-desc">{{ folder.folder_description|default:"No description." }}</div>
+                    <div class="folder-sidebar-meta">
+                        <div class="folder-meta-row"><span class="folder-meta-icon">📋</span> {{ lists.count }} list{{ lists.count|pluralize }}</div>
+                        <div class="folder-meta-row"><span class="folder-meta-icon">🗓</span> Created {{ folder.created_at|date:"M j, Y" }}</div>
+                        <div class="folder-meta-row"><span class="folder-meta-icon">✏️</span> Updated {{ folder.updated_at|date:"M j, Y" }}</div>
+                    </div>
+                    <button class="btn btn-outline btn-sm w-full" style="margin-top:1rem;" onclick="toggleFolderEdit(true)">
+                        ✏️ Edit Details
+                    </button>
+                </div>
+
+                <div id="folderEditMode" style="display:none;">
+                    <div style="font-family:var(--font-display);font-weight:700;margin-bottom:0.75rem;color:var(--gray-900);">Edit Folder</div>
+                    <form method="POST" action="{% url 'update_folder' folder.folderid %}" class="folder-edit-form" id="folderEditForm" novalidate>
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="form-label" for="editFolderName">Name</label>
+                            <input class="form-input" type="text" id="editFolderName" name="folder_name"
+                                   value="{{ folder.folder_name }}" maxlength="30" required>
+                            <span class="form-error" id="editFolderNameErr"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="editFolderDesc">Description</label>
+                            <textarea class="form-input" id="editFolderDesc" name="folder_description"
+                                      rows="3" maxlength="255">{{ folder.folder_description }}</textarea>
+                        </div>
+                        <div style="display:flex;gap:0.5rem;">
+                            <button type="button" class="btn btn-ghost btn-sm" onclick="toggleFolderEdit(false)">Cancel</button>
+                            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lists area -->
+        <div class="lists-area">
+            <div class="section-header">
+                <div>
+                    <div class="section-title">Lists</div>
+                    <div class="section-sub">All lists inside <strong>{{ folder.folder_name }}</strong></div>
+                </div>
+                <button class="btn btn-primary" onclick="openModal('createListModal')">＋ New List</button>
+            </div>
+
+            {% if lists %}
+                {% for list in lists %}
+                {% if list.list_type == "Bulletpoint" %}
+                    {% with icon="•" icon_class="list-icon-bullet" badge_class="badge-fuchsia" %}
+                {% elif list.list_type == "Numbered" %}
+                    {% with icon="1." icon_class="list-icon-numbered" badge_class="badge-gold" %}
+                {% else %}
+                    {% with icon="☑" icon_class="list-icon-checkbox" badge_class="badge-gray" %}
+                {% endif %}
+                <a class="list-item" href="{% url 'list_detail' list.listid %}">
+                    <div class="list-item-icon {{ icon_class }}">
+                        {% if list.list_type == "Bulletpoint" %}•{% elif list.list_type == "Numbered" %}①{% else %}☑{% endif %}
+                    </div>
+                    <div class="list-item-body">
+                        <div class="list-item-title">{{ list.list_title }}</div>
+                        <div class="list-item-desc">{{ list.list_description|default:"No description." }}</div>
+                    </div>
+                    <div class="list-item-right">
+                        <span class="badge {{ badge_class }}">{{ list.list_type }}</span>
+                        <span class="list-item-count">{{ list.listmembers_set.count }} item{{ list.listmembers_set.count|pluralize }}</span>
+                        <span class="list-arrow">→</span>
+                    </div>
+                </a>
+                {% endwith %}
+                {% endfor %}
+            {% else %}
+            <div class="card">
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <div class="empty-title">No lists yet</div>
+                    <div class="empty-sub">Create your first list inside this folder.</div>
+                    <button class="btn btn-primary" style="margin-top:1.25rem;" onclick="openModal('createListModal')">＋ Create First List</button>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if lists %}
+            <div class="new-list-card" onclick="openModal('createListModal')">
+                ➕ Create a new list
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Create List Modal -->
+<div class="modal-overlay" id="createListModal">
+    <div class="modal" style="max-width:500px;">
+        <button class="modal-close" onclick="closeModal('createListModal')">✕</button>
+        <div class="modal-title">📋 Create New List</div>
+
+        <form method="POST" action="{% url 'create_list' folder.folderid %}" id="createListForm" novalidate>
+            {% csrf_token %}
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="listTitle">List Title</label>
+                    <input class="form-input" type="text" id="listTitle" name="list_title"
+                           placeholder="e.g. Grocery Shopping" maxlength="30" required>
+                    <span class="form-error" id="listTitleErr"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="listDesc">Description <span style="font-weight:400;color:var(--gray-400)">(optional)</span></label>
+                    <input class="form-input" type="text" id="listDesc" name="list_description"
+                           placeholder="Brief description" maxlength="255">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">List Type</label>
+                    <div class="type-picker">
+                        <div>
+                            <input class="type-option" type="radio" name="list_type" id="typeBullet" value="Bulletpoint" checked>
+                            <label class="type-label" for="typeBullet">
+                                <span class="type-label-icon">•</span> Bullet Point
+                            </label>
+                        </div>
+                        <div>
+                            <input class="type-option" type="radio" name="list_type" id="typeNumbered" value="Numbered">
+                            <label class="type-label" for="typeNumbered">
+                                <span class="type-label-icon">①</span> Numbered
+                            </label>
+                        </div>
+                        <div>
+                            <input class="type-option" type="radio" name="list_type" id="typeCheckbox" value="Checkbox">
+                            <label class="type-label" for="typeCheckbox">
+                                <span class="type-label-icon">☑</span> Checkbox
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="closeModal('createListModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create List</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+function toggleFolderEdit(show) {
+    document.getElementById('folderViewMode').style.display = show ? 'none' : '';
+    document.getElementById('folderEditMode').style.display = show ? '' : 'none';
+}
+
+document.getElementById('createListForm').addEventListener('submit', function(e) {
+    const title = document.getElementById('listTitle').value.trim();
+    const err   = document.getElementById('listTitleErr');
+    if (!title) {
+        e.preventDefault();
+        document.getElementById('listTitle').classList.add('error');
+        err.textContent = 'List title is required.'; err.classList.add('visible');
+    }
+});
+
+document.getElementById('folderEditForm').addEventListener('submit', function(e) {
+    const name = document.getElementById('editFolderName').value.trim();
+    const err  = document.getElementById('editFolderNameErr');
+    if (!name) {
+        e.preventDefault();
+        document.getElementById('editFolderName').classList.add('error');
+        err.textContent = 'Folder name cannot be empty.'; err.classList.add('visible');
+    }
+});
+</script>
+{% endblock %}
