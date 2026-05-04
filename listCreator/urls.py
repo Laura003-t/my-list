@@ -15,15 +15,14 @@ urlpatterns = [
 
     # Folders
     path('folders/create/', views.folders_create, name='create_folder'),
+    path('folders/<str:pk>/update/', views.lists_update, name='update_folder'),
 
     # Lists
     path('folders/<str:pk>/lists/', views.lists, name='lists'),
     path('folders/<str:pk>/lists/create/', views.lists_create, name='create_list'),
-    path('folders/<str:pk>/lists/update/', views.lists_update, name='update_folder'),
 
     # List details
     path('lists/<str:pk>/', views.list_details, name='list_detail'),
-    path('lists/<str:pk>/create/', views.list_create, name='create_list'),
     path('lists/<str:pk>/add-item/', views.add_list_item, name='add_list_item'),
     path('lists/<str:pk>/export-pdf/', views.export_list, name='export_list_pdf'),
 
